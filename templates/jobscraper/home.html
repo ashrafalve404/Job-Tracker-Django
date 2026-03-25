@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}JobTrack - Find Your Dream Job{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1>Find Your Perfect Job</h1>
+        <p>Discover opportunities from top companies. Search, save, and apply to your dream role.</p>
+        
+        <div class="hero-buttons">
+            <a href="{% url 'jobscraper:jobs' %}" class="btn btn-primary">Browse Jobs</a>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'jobscraper:register' %}" class="btn btn-outline">Create Account</a>
+            {% endif %}
+        </div>
+        
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="hero-stat-number">{{ total_active_jobs }}</span>
+                <span class="hero-stat-label">Active Jobs</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-number">{{ total_companies }}</span>
+                <span class="hero-stat-label">Companies</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-number">{{ total_sources }}</span>
+                <span class="hero-stat-label">Sources</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="padding: 24px 16px;">
+    <div class="flex-between" style="margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <h2>Latest Opportunities</h2>
+        <a href="{% url 'jobscraper:jobs' %}" class="btn btn-ghost btn-sm">View All →</a>
+    </div>
+    
+    {% if latest_jobs %}
+        <div class="jobs-grid">
+            {% for job in latest_jobs %}
+                <div class="card job-card">
+                    <h3 class="job-card-title">
+                        <a href="{% url 'jobscraper:job_detail' job.id %}">{{ job.title }}</a>
+                    </h3>
+                    <div class="job-card-company">{{ job.company }}</div>
+                    
+                    <div class="job-card-meta">
+                        <span class="job-card-meta-item">{{ job.location|default:"Bangladesh" }}</span>
+                        {% if job.deadline %}
+                        <span class="job-card-meta-item">{{ job.deadline|date:"M d" }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="job-card-footer">
+                        <span class="job-card-source">{{ job.source.name }}</span>
+                        <span class="badge badge-{{ job.work_mode }}">{{ job.get_work_mode_display }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3>No Jobs Available</h3>
+            <p>We're currently scraping jobs. Check back soon.</p>
+            <a href="{% url 'jobscraper:jobs' %}" class="btn btn-primary mt-3">Browse Jobs</a>
+        </div>
+    {% endif %}
+</div>
+
+<div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 32px 16px; margin-top: 24px;">
+    <div class="container flex-between" style="flex-wrap: wrap; gap: 16px;">
+        <div style="flex: 1; min-width: 200px;">
+            <h2 style="color: white; margin-bottom: 8px; font-size: 1.2rem;">Start Your Career Journey</h2>
+            <p style="color: #94a3b8; font-size: 0.85rem;">Create a free account to save jobs.</p>
+        </div>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'jobscraper:register' %}" class="btn btn-primary">Get Started</a>
+        {% else %}
+            <a href="{% url 'jobscraper:saved_jobs' %}" class="btn btn-primary">My Saved Jobs</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

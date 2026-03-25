@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container" style="text-align: center; padding: 50px;">
+    <h1 style="color: #28a745;">Success!</h1>
+    <p style="font-size: 1.2em;">{{ count }} job source(s) added successfully!</p>
+    <a href="{{ back_url }}" class="btn btn-primary" style="margin-top: 20px;">Go to Job Sources</a>
+</div>
+{% endblock %}

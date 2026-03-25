@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Jobs - JobTrack{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 24px 16px;">
+    <div class="jobs-header">
+        <h1 class="jobs-title">Browse Jobs</h1>
+        <p class="jobs-count">{{ page_obj.paginator.count }} opportunities</p>
+    </div>
+    
+    <!-- Search -->
+    <div class="search-bar">
+        <form method="get" style="display: flex; flex: 1; gap: 8px; align-items: center;">
+            {% if filter_work_mode %}<input type="hidden" name="work_mode" value="{{ filter_work_mode }}">{% endif %}
+            {% if filter_job_type %}<input type="hidden" name="job_type" value="{{ filter_job_type }}">{% endif %}
+            {% if filter_source %}<input type="hidden" name="source" value="{{ filter_source }}">{% endif %}
+            <input type="text" name="search" value="{{ filter_search|default:'' }}" placeholder="Search jobs..." style="border: none; flex: 1; font-size: 0.9rem; background: transparent; min-width: 0;">
+            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+        </form>
+    </div>
+    
+    <!-- Filters -->
+    <div class="filter-section">
+        <div class="filter-group">
+            <label>Work Mode</label>
+            <select onchange="window.location.href=this.value">
+                <option value="{% url 'jobscraper:jobs' %}">All</option>
+                <option value="{% url 'jobscraper:jobs' %}?work_mode=remote" {% if filter_work_mode == 'remote' %}selected{% endif %}>Remote</option>
+                <option value="{% url 'jobscraper:jobs' %}?work_mode=onsite" {% if filter_work_mode == 'onsite' %}selected{% endif %}>On-site</option>
+                <option value="{% url 'jobscraper:jobs' %}?work_mode=hybrid" {% if filter_work_mode == 'hybrid' %}selected{% endif %}>Hybrid</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Job Type</label>
+            <select onchange="window.location.href=this.value">
+                <option value="{% url 'jobscraper:jobs' %}">All Types</option>
+                <option value="{% url 'jobscraper:jobs' %}?job_type=full_time" {% if filter_job_type == 'full_time' %}selected{% endif %}>Full Time</option>
+                <option value="{% url 'jobscraper:jobs' %}?job_type=part_time" {% if filter_job_type == 'part_time' %}selected{% endif %}>Part Time</option>
+                <option value="{% url 'jobscraper:jobs' %}?job_type=internship" {% if filter_job_type == 'internship' %}selected{% endif %}>Internship</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Source</label>
+            <select onchange="window.location.href=this.value">
+                <option value="{% url 'jobscraper:jobs' %}">All Sources</option>
+                {% for source in sources %}
+                <option value="{% url 'jobscraper:jobs' %}?source={{ source.id }}" {% if filter_source == source.id|stringformat:'s' %}selected{% endif %}>{{ source.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <a href="{% url 'jobscraper:jobs' %}" class="btn btn-ghost btn-sm">Clear</a>
+    </div>
+    
+    <!-- Jobs Grid -->
+    {% if page_obj %}
+        <div class="jobs-grid">
+            {% for job in page_obj %}
+                <div class="card job-card">
+                    <h3 class="job-card-title">
+                        <a href="{% url 'jobscraper:job_detail' job.id %}">{{ job.title }}</a>
+                    </h3>
+                    <div class="job-card-company">{{ job.company }}</div>
+                    
+                    <div class="job-card-meta">
+                        <span class="job-card-meta-item">{{ job.location|default:"Bangladesh" }}</span>
+                        {% if job.deadline %}
+                        <span class="job-card-meta-item">{{ job.deadline|date:"M d" }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="job-card-footer">
+                        <span class="job-card-source">{{ job.source.name }}</span>
+                        <div class="flex gap-1">
+                            {% if user.is_authenticated %}
+                                {% if job.id in saved_job_ids %}
+                                    <a href="{% url 'jobscraper:remove_saved_job' job.id %}" class="btn btn-ghost btn-sm" title="Unsave">★</a>
+                                {% else %}
+                                    <a href="{% url 'jobscraper:save_job' job.id %}" class="btn btn-ghost btn-sm" title="Save">☆</a>
+                                {% endif %}
+                            {% endif %}
+                            <span class="badge badge-{{ job.work_mode }}">{{ job.get_work_mode_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if filter_search %}&search={{ filter_search }}{% endif %}{% if filter_work_mode %}&work_mode={{ filter_work_mode }}{% endif %}{% if filter_job_type %}&job_type={{ filter_job_type }}{% endif %}{% if filter_source %}&source={{ filter_source }}{% endif %}">← Prev</a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <a href="?page={{ num }}{% if filter_search %}&search={{ filter_search }}{% endif %}{% if filter_work_mode %}&work_mode={{ filter_work_mode }}{% endif %}{% if filter_job_type %}&job_type={{ filter_job_type }}{% endif %}{% if filter_source %}&source={{ filter_source }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if filter_search %}&search={{ filter_search }}{% endif %}{% if filter_work_mode %}&work_mode={{ filter_work_mode }}{% endif %}{% if filter_job_type %}&job_type={{ filter_job_type }}{% endif %}{% if filter_source %}&source={{ filter_source }}{% endif %}">Next →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <h3>No Jobs Found</h3>
+            <p>Try adjusting your search or filters.</p>
+            <a href="{% url 'jobscraper:jobs' %}" class="btn btn-primary mt-3">Clear Filters</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

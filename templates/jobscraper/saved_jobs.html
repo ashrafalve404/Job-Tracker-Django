@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Jobs - JobTrack{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 16px;">
+    <div class="saved-jobs-header">
+        <h1>Saved Jobs</h1>
+        <p class="text-muted">Your bookmarked listings</p>
+    </div>
+    
+    {% if saved_jobs %}
+        <div class="jobs-grid">
+            {% for saved in saved_jobs %}
+                <div class="card job-card">
+                    <h3 class="job-card-title">
+                        <a href="{% url 'jobscraper:job_detail' saved.job.id %}">{{ saved.job.title }}</a>
+                    </h3>
+                    <div class="job-card-company">{{ saved.job.company }}</div>
+                    
+                    <div class="job-card-meta">
+                        <span class="job-card-meta-item">{{ saved.job.location|default:"Bangladesh" }}</span>
+                        <span class="job-card-meta-item">Saved: {{ saved.saved_at|date:"M d" }}</span>
+                    </div>
+                    
+                    <div class="job-card-footer">
+                        <span class="job-card-source">{{ saved.job.source.name }}</span>
+                        <div class="flex gap-1">
+                            <span class="badge badge-{{ saved.job.work_mode }}">{{ saved.job.get_work_mode_display }}</span>
+                            <a href="{% url 'jobscraper:remove_saved_job' saved.job.id %}" class="btn btn-ghost btn-sm" onclick="return confirm('Remove?')">✕</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">★</div>
+            <h3>No Saved Jobs</h3>
+            <p>Start browsing and save jobs to see them here.</p>
+            <a href="{% url 'jobscraper:jobs' %}" class="btn btn-primary mt-3">Browse Jobs</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

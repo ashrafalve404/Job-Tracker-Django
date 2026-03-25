@@ -1,0 +1,75 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Bulk Add Job Sources</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="id_urls">Job Site URLs</label>
+            {{ form.urls }}
+            <p class="help">Enter job site URLs, one per line. You can specify a name before the URL like: <code>Remote OK,https://remoteok.com</code></p>
+        </div>
+        
+        <div class="form-group">
+            <label>
+                {{ form.activate }}
+                {{ form.activate.label }}
+            </label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Add Sources</button>
+        <a href="/admin/jobscraper/jobsource/" class="btn btn-secondary">Cancel</a>
+    </form>
+    
+    <div style="margin-top: 30px;">
+        <h3>Example URLs to Add:</h3>
+        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
+Remote OK,https://remoteok.com/remote-python-jobs
+We Work Remotely,https://weworkremotely.com/remote-jobs
+Indeed,https://www.indeed.com/jobs?q=python
+BD Jobs,https://www.bdjobs.com.hk/
+LinkedIn Jobs,https://www.linkedin.com/jobs/search/?keywords=python
+        </pre>
+    </div>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: monospace;
+}
+.help {
+    color: #666;
+    font-size: 0.9em;
+}
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-right: 10px;
+}
+.btn-primary {
+    background: #0f5eae;
+    color: white;
+}
+.btn-secondary {
+    background: #ccc;
+    color: #333;
+}
+</style>
+{% endblock %}

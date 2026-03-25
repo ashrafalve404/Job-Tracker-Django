@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - JobTrack{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="card auth-card">
+        <div class="auth-header">
+            <h2>Welcome Back</h2>
+            <p>Sign in to access your saved jobs</p>
+        </div>
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-error mb-3">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" name="username" id="id_username" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password" class="form-label">Password</label>
+                <input type="password" name="password" id="id_password" class="form-control" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{% url 'jobscraper:register' %}">Create one</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

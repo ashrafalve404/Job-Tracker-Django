@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}JobTrack - Find Your Dream Job{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggle = document.querySelector('.menu-toggle');
+        var nav = document.querySelector('.pc-nav .nav-menu');
+        if(toggle && nav) {
+            toggle.addEventListener('click', function() {
+                toggle.classList.toggle('active');
+                nav.classList.toggle('active');
+            });
+        }
+    });
+    </script>
+</head>
+<body>
+    <!-- PC Mode: Fixed Top Navbar -->
+    <header class="pc-nav">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <a href="{% url 'jobscraper:home' %}">JobTrack</a>
+            </div>
+            
+            <!-- Mobile Menu Toggle (visible on mobile) -->
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="{% url 'jobscraper:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="{% url 'jobscraper:jobs' %}" class="{% if request.resolver_match.url_name == 'jobs' %}active{% endif %}">Jobs</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'jobscraper:saved_jobs' %}" class="{% if request.resolver_match.url_name == 'saved_jobs' %}active{% endif %}">Saved</a></li>
+                    <li><span style="color: var(--gray-500); font-size: 0.85rem;">Hi, {{ user.username }}</span></li>
+                    <li><a href="{% url 'jobscraper:logout' %}" class="btn btn-outline btn-sm">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'jobscraper:login' %}">Login</a></li>
+                    <li><a href="{% url 'jobscraper:register' %}" class="btn btn-primary btn-sm">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- PC Mode: Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>JobTrack</h3>
+                    <p>Your personal job circular aggregator. Find your dream job from multiple sources.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Browse</h4>
+                    <ul>
+                        <li><a href="{% url 'jobscraper:jobs' %}">All Jobs</a></li>
+                        <li><a href="{% url 'jobscraper:jobs' %}?work_mode=remote">Remote</a></li>
+                        <li><a href="{% url 'jobscraper:jobs' %}?work_mode=onsite">Onsite</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Account</h4>
+                    <ul>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'jobscraper:saved_jobs' %}">Saved Jobs</a></li>
+                            <li><a href="{% url 'jobscraper:logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{% url 'jobscraper:login' %}">Login</a></li>
+                            <li><a href="{% url 'jobscraper:register' %}">Sign Up</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {% now "Y" %} JobTrack. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Mode: Bottom Navbar -->
+    <nav class="mobile-nav">
+        <ul class="mobile-nav-menu">
+            <li class="mobile-nav-item">
+                <a href="{% url 'jobscraper:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <span class="mobile-nav-icon">⌂</span>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="{% url 'jobscraper:jobs' %}" class="{% if request.resolver_match.url_name == 'jobs' %}active{% endif %}">
+                    <span class="mobile-nav-icon">◈</span>
+                    <span>Jobs</span>
+                </a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="mobile-nav-item">
+                <a href="{% url 'jobscraper:saved_jobs' %}" class="{% if request.resolver_match.url_name == 'saved_jobs' %}active{% endif %}">
+                    <span class="mobile-nav-icon">☆</span>
+                    <span>Saved</span>
+                </a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="{% url 'jobscraper:logout' %}">
+                    <span class="mobile-nav-icon">⎋</span>
+                    <span>Logout</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="mobile-nav-item">
+                <a href="{% url 'jobscraper:login' %}">
+                    <span class="mobile-nav-icon">◐</span>
+                    <span>Login</span>
+                </a>
+            </li>
+            <li class="mobile-nav-item">
+                <a href="{% url 'jobscraper:register' %}">
+                    <span class="mobile-nav-icon">⊕</span>
+                    <span>Sign Up</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</body>
+</html>
